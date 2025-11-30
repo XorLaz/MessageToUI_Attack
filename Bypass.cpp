@@ -51,7 +51,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	//这里是判断上次消息和现在消息是否相同  如果相同就屏蔽掉 但是感觉没啥必要了
 	/*if (lastMessage == str) {
 		std::cout << "Duplicate information detected" << std::endl;
-		return 0;
+		return -1;
 	}*/
 
 
@@ -65,7 +65,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 		if (now - lastChatTime < 500 && lastPlayerName == PlayerName)
 		{
 			std::cout << "Spam Detected (duplicate message within 0.5s)\n";
-			return 0;
+			return -1;
 		}
 
 
@@ -86,7 +86,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	if (starCount > 70) {
 
 		std::cout << "Spam" << starCount << "*" << std::endl;
-		return 0;
+		return -1;
 	}
 
 
