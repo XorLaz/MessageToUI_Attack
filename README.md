@@ -10,5 +10,7 @@
 
 
 <img width="359" height="316" alt="QQ20251130-112758" src="https://github.com/user-attachments/assets/cee2e296-8134-4ee8-9468-a71eae82d7e3" />
+<img width="875" height="542" alt="微信图片_2025-11-30_113848_344" src="https://github.com/user-attachments/assets/bd032e11-b868-46c3-b3f5-a9dc86156e6e" />
+
 
 
