@@ -55,6 +55,28 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	}*/
 
 
+
+	// 判定为聊天消息  可能性较高
+	if (ContainsChinese(buf + 0xC, 6)) {
+		std::string PlayerName(buf + 0xC, 6);
+		DWORD now = GetTickCount();
+
+		// 0.5 秒内重复消息   这里是判断刷屏   时长是500毫秒 也可以改小一些 
+		if (now - lastChatTime < 500 && lastPlayerName == PlayerName)
+		{
+			std::cout << "Spam Detected (duplicate message within 0.5s)\n";
+			return 0;
+		}
+
+
+		lastChatTime = now;
+		lastPlayerName = PlayerName;
+
+	}
+
+
+
+
 	int starCount = 0;
 	for (char c : str) {
 		if (c == '*') starCount++;
@@ -68,24 +90,6 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	}
 
 
-
-	// 判定为聊天消息  可能性较高
-	if (ContainsChinese(buf + 0xC, 6)) {
-		std::string PlayerName(buf + 0xC, 6);
-		DWORD now = GetTickCount();
-
-		// 0.5 秒内重复消息   这里是判断刷屏   时长是500毫秒 也可以改小一些  (改的太小容易出现网络问题)
-		if (now - lastChatTime < 500 && lastPlayerName == PlayerName)
-		{
-			std::cout << "Spam Detected (duplicate message within 0.5s)\n";
-			return 0;
-		}
-
-
-		lastChatTime = now;
-		lastPlayerName = PlayerName;
-
-	}
 
 
 
