@@ -1,4 +1,4 @@
-﻿#include "Bypass.h"
+#include "Bypass.h"
 #include <WinSock2.h>
 #include <iostream>
 #include <string>
@@ -37,7 +37,8 @@ bool ContainsChinese(const char* data, int len) {
 
 
 DWORD lastChatTime = 0;
-std::string lastMessage = "";
+//std::string lastMessage = "";
+std::string lastPlayerName = "";
 int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 {
 	int ret = OriginalRecv(s, buf, len, flags);
@@ -47,10 +48,11 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 	std::string str(buf, ret);
 
-	if (lastMessage == str) {
+	//这里是判断上次消息和现在消息是否相同  如果相同就屏蔽掉 但是感觉没啥必要了
+	/*if (lastMessage == str) {
 		std::cout << "Duplicate information detected" << std::endl;
 		return 0;
-	}
+	}*/
 
 
 	int starCount = 0;
@@ -58,8 +60,8 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 		if (c == '*') starCount++;
 	}
 
-	// 如果星号超过40个，屏蔽消息
-	if (starCount > 40) {
+	// 如果星号超过70个，屏蔽消息
+	if (starCount > 70) {
 
 		std::cout << "Spam" << starCount << "*" << std::endl;
 		return 0;
@@ -68,21 +70,20 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 
 	// 判定为聊天消息  可能性较高
-	if (ContainsChinese(buf, 30)) {
-
+	if (ContainsChinese(buf + 0xC, 6)) {
+		std::string PlayerName(buf + 0xC, 6);
 		DWORD now = GetTickCount();
 
-
-		// 1 秒内重复消息   这里是判断刷屏   时长是1000毫秒 也可以改小一些 太小容易出现问题(网络延迟)
-		if (now - lastChatTime < 1000)
+		// 0.5 秒内重复消息   这里是判断刷屏   时长是500毫秒 也可以改小一些  (改的太小容易出现网络问题)
+		if (now - lastChatTime < 500 && lastPlayerName == PlayerName)
 		{
-			std::cout << "Spam Detected (duplicate message within 1s)\n";
-			return 0; 
+			std::cout << "Spam Detected (duplicate message within 0.5s)\n";
+			return 0;
 		}
 
 
 		lastChatTime = now;
-
+		lastPlayerName = PlayerName;
 
 	}
 
@@ -92,7 +93,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	//std::cout << "text: " << str << "\n\n\n" << std::endl;
 
 
-	lastMessage = str;
+	//lastMessage = str;
 
 	return ret;
 
@@ -100,7 +101,4 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 
 //  By XorLaz(小懒仔)  QQ 2499464524
-
  // 2025 .11.30
-
-
