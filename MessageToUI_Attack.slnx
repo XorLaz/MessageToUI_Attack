@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MessageToUI_Attack.vcxproj" Id="b6be805e-578b-4b57-9ca2-caba9ebc4319" />
+</Solution>
