@@ -88,8 +88,8 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 
 
-	printf("buf:%X  length:%d\n", buf, ret);
-	std::cout << "text: " << str << "\n\n\n" << std::endl;
+	//printf("buf:%X  length:%d\n", buf, ret);
+	//std::cout << "text: " << str << "\n\n\n" << std::endl;
 
 
 	lastMessage = str;
@@ -100,4 +100,5 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 
 //  By XorLaz(小懒仔)  QQ 2499464524
+
  // 2025 .11.30
