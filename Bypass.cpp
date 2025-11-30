@@ -73,7 +73,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 		DWORD now = GetTickCount();
 
 
-		// 1 秒内重复消息   这里是判断刷屏   时长是500毫秒 也可以改小一些 
+		// 1 秒内重复消息   这里是判断刷屏   时长是1000毫秒 也可以改小一些 太小容易出现问题(网络延迟)
 		if (now - lastChatTime < 1000)
 		{
 			std::cout << "Spam Detected (duplicate message within 1s)\n";
@@ -102,4 +102,5 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 //  By XorLaz(小懒仔)  QQ 2499464524
 
  // 2025 .11.30
+
 
