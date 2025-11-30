@@ -24,10 +24,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
          freopen(("CON"), "r", stdin);   // 重定向标准输入
          SetConsoleOutputCP(CP_UTF8);
 
-	    HMODULE hModule = GetModuleHandleA("ws2_32.dll");
-         printf("hModule %X\n", (int)hModule);
+	     HMODULE hModule = GetModuleHandleA("ws2_32.dll");
+         //printf("hModule %X\n", (int)hModule);
          FARPROC recv_addr = GetProcAddress(hModule, "recv");
-         printf("recv_addr %X\n", (int)recv_addr);
+         //printf("recv_addr %X\n", (int)recv_addr);
+
+		 printf("       Anti Spam messages Begin !!! \n\n\n");
 
          MH_Initialize();
          MH_CreateHook(recv_addr, HookedRecv, (void**)&OriginalRecv);
@@ -45,4 +47,5 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 
 //  By XorLaz(小懒仔)  QQ 2499464524
+
  // 2025 .11.30
