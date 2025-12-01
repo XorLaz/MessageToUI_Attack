@@ -37,7 +37,8 @@ bool ContainsChinese(const char* data, int len) {
 
 
 DWORD lastChatTime = 0;
-//std::string lastMessage = "";
+std::string lastMessage = "";
+int lastLedn;
 std::string lastPlayerName = "";
 int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 {
@@ -46,25 +47,21 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	if (ret == -1)   // 排除一下错误信息
 		return ret;
 
-	std::string str(buf, ret);
+	std::string str(buf+0x1A, 10);
 
-	//这里是判断上次消息和现在消息是否相同  如果相同就屏蔽掉 但是感觉没啥必要了
-	/*if (lastMessage == str) {
-		std::cout << "Duplicate information detected" << std::endl;
-		return -1;
-	}*/
+
 
 
 
 	// 判定为聊天消息  可能性较高
-	if (ContainsChinese(buf + 0xC, 6)) {
-		std::string PlayerName(buf + 0xC, 6);
+	if (ContainsChinese(buf + 0xC, 14)) {
+		std::string PlayerName(buf + 0xC, 14);
 		DWORD now = GetTickCount();
 
-		// 0.5 秒内重复消息   这里是判断刷屏   时长是500毫秒 也可以改小一些 
-		if (now - lastChatTime < 500 && lastPlayerName == PlayerName)
+		// 0.2 秒内重复消息   这里是判断刷屏   时长是200毫秒 也可以改小一些 
+		if (now - lastChatTime < 200 && lastPlayerName == PlayerName)
 		{
-			std::cout << "Spam Detected (duplicate message within 0.5s)\n";
+			std::cout << "Spam Detected (duplicate message within 0.2s)\n";
 			return -1;
 		}
 
@@ -76,28 +73,19 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 
 
-
-	int starCount = 0;
-	for (char c : str) {
-		if (c == '*') starCount++;
-	}
-
-	// 如果星号超过70个，屏蔽消息
-	if (starCount > 70) {
-
-		std::cout << "Spam" << starCount << "*" << std::endl;
+	//这里是判断上次消息和现在消息是否相同  如果相同就屏蔽掉 但是感觉没啥必要了
+	if (lastMessage == str && lastLedn == len && ContainsChinese(buf + 0xC, 14)) {
+		std::cout << "Duplicate information detected" << std::endl;
 		return -1;
 	}
-
-
 
 
 
 	//printf("buf:%X  length:%d\n", buf, ret);
 	//std::cout << "text: " << str << "\n\n\n" << std::endl;
 
-
-	//lastMessage = str;
+	lastLedn = len;
+	lastMessage = str;
 
 	return ret;
 
