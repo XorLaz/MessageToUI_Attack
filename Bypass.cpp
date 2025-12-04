@@ -5,7 +5,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 //  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .12.1
+ // 2025 .12.4
 
 typedef int (WINAPI* pRecv)(SOCKET, char*, int, int);
 pRecv OriginalRecv;
@@ -47,9 +47,13 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 	if (ret == -1)   // 排除一下错误信息
 		return ret;
 
-	std::string str(buf+0x1A, 10);
+	std::string str(buf + 0x1A, 10);
 
-
+	if(str.find("hhhhhhh") != std::string::npos || str.find("HHHHHHH") != std::string::npos)
+	{
+		std::cout << "Going viral: hhhhh\n";
+		return -1;
+	}
 
 
 
@@ -92,5 +96,4 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 }
 
 //  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .12.1
-
+ // 2025 .12.4
