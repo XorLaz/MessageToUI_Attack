@@ -5,7 +5,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 //  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .12.29
+ // 2025 .2.1
 
 typedef int (WINAPI* pRecv)(SOCKET, char*, int, int);
 pRecv OriginalRecv;
@@ -47,7 +47,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
     if (ret == -1)   // 排除一下错误信息
         return ret;
 
-    std::string str(buf + 0x1A, 30);
+    std::string str(buf + 0x1A, len);
 
     if(str.find("hhhhhhh") != std::string::npos || str.find("HHHHHHH") != std::string::npos)
     {
@@ -62,10 +62,10 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
         std::string PlayerName(buf + 0xC, 14);
         DWORD now = GetTickCount();
 
-        // 0.2 秒内重复消息   这里是判断刷屏   时长是200毫秒 也可以改小一些 
-        if (now - lastChatTime < 200 && lastPlayerName == PlayerName)
+        // 0.05 秒内重复消息   这里是判断刷屏   时长是0.05毫秒 也可以改小一些 
+        if (now - lastChatTime < 50 && lastPlayerName == PlayerName)
         {
-            std::cout << "Spam Detected (duplicate message within 0.2s)\n";
+            std::cout << "Spam Detected (duplicate message within 0.05s)\n";
             return -1;
         }
 
