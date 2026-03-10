@@ -5,7 +5,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 //  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .2.1
+ // 2026 .3.10
 
 typedef int (WINAPI* pRecv)(SOCKET, char*, int, int);
 pRecv OriginalRecv;
@@ -32,7 +32,28 @@ bool ContainsChinese(const char* data, int len) {
     return false;
 }
 
+bool HasRepeatingChars(const std::string& str, int threshold = 7) {
+	if (str.length() < threshold) {
+		return false;
+	}
 
+	int consecutiveCount = 1;  // 当前连续重复次数
+	for (size_t i = 1; i < str.length(); i++) {
+		if (str[i] == str[i - 1]) {
+			consecutiveCount++;
+			// 超过阈值
+			if (consecutiveCount >= threshold) {
+				return true;
+			}
+		}
+		else {
+			// 字符变了，重置计数
+			consecutiveCount = 1;
+		}
+	}
+
+	return false;
+}
 
 
 
@@ -56,6 +77,10 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
     }
 
 
+	    if (HasRepeatingChars(str, 8)) {
+		      std::cout << "Going viral: Others\n";
+		       return -1;
+     	}
 
     // 判定为聊天消息  可能性较高
     if (ContainsChinese(buf + 0xC, 14)) {
@@ -96,4 +121,5 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 }
 
 //  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .12.29
+ // 2026 .3.10
+
