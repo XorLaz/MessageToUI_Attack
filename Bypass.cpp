@@ -32,22 +32,33 @@ bool ContainsChinese(const char* data, int len) {
     return false;
 }
 
-bool HasRepeatingChars(const std::string& str, int threshold = 7) {
-	if (str.length() < threshold) {
-		return false;
-	}
+bool HasRepeatingChars(const std::string& str, int threshold = 15) {
+	int consecutiveCount = 1;
 
-	int consecutiveCount = 1;  // 当前连续重复次数
 	for (size_t i = 1; i < str.length(); i++) {
-		if (str[i] == str[i - 1]) {
-			consecutiveCount++;
-			// 超过阈值
-			if (consecutiveCount >= threshold) {
-				return true;
+		char current = str[i];
+		char previous = str[i - 1];
+
+		// 只检测英文字母 a-z A-Z
+		if ((current >= 'a' && current <= 'z') || (current >= 'A' && current <= 'Z')) {
+			if ((previous >= 'a' && previous <= 'z') || (previous >= 'A' && previous <= 'Z')) {
+				// 都是字母，检查是否相同
+				if (current == previous) {
+					consecutiveCount++;
+
+					if (consecutiveCount >= threshold) {
+						return true;
+					}
+				}
+				else {
+					consecutiveCount = 1;
+				}
+			}
+			else {
+				consecutiveCount = 1;
 			}
 		}
 		else {
-			// 字符变了，重置计数
 			consecutiveCount = 1;
 		}
 	}
@@ -77,7 +88,7 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
     }
 
 
-	    if (HasRepeatingChars(str, 8)) {
+	    if (HasRepeatingChars(str, 15)) {
 		      std::cout << "Going viral: Others\n";
 		       return -1;
      	}
@@ -122,4 +133,5 @@ int WINAPI HookedRecv(SOCKET s, char* buf, int len, int flags)
 
 //  By XorLaz(小懒仔)  QQ 2499464524
  // 2026 .3.10
+
 
