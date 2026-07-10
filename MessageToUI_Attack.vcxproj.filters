@@ -45,7 +45,13 @@
     <ClCompile Include="MinHook\src\hde\hde64.c">
       <Filter>MinHook\src\hde</Filter>
     </ClCompile>
-    <ClCompile Include="Bypass.cpp">
+    <ClCompile Include="RecvHook.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SpamFilter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Protocol.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,7 +80,13 @@
     <ClInclude Include="MinHook\src\hde\table64.h">
       <Filter>MinHook\src\hde</Filter>
     </ClInclude>
-    <ClInclude Include="Bypass.h">
+    <ClInclude Include="RecvHook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SpamFilter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

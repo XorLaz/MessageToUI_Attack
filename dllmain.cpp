@@ -1,51 +1,58 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
 #include <windows.h>
+#include <cstdio>
 #include "MinHook/include/MinHook.h"
-#include "Bypass.h"
+#include "RecvHook.h"
 
-//  By XorLaz(小懒仔)  QQ 2499464524
- // 2025 .11.30
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    {
+// 2026 7.11 增加了一些安全性检查和准确性  
 
-         AllocConsole();
-         freopen(("CON"), "w", stdout);  // 重定向标准输出
-         freopen(("CON"), "w", stderr);  // 重定向标准错误输出
-         freopen(("CON"), "r", stdin);   // 重定向标准输入
-         SetConsoleOutputCP(CP_UTF8);
 
-	     HMODULE hModule = GetModuleHandleA("ws2_32.dll");
-         //printf("hModule %X\n", (int)hModule);
-         FARPROC recv_addr = GetProcAddress(hModule, "recv");
-         //printf("recv_addr %X\n", (int)recv_addr);
+static DWORD WINAPI InitThread(LPVOID) {
+    // AllocConsole();
+     //FILE* dummy = nullptr;
+     //freopen_s(&dummy, "CONOUT$", "w", stdout);
+     //freopen_s(&dummy, "CONOUT$", "w", stderr);
+     //SetConsoleOutputCP(CP_UTF8);
+     std::printf("=== recv anti-spam filter loaded ===\n");
 
-		 printf("       Anti Spam messages Begin !!! \n\n\n");
+     HMODULE ws2 = GetModuleHandleA("ws2_32.dll");
+     if (!ws2) { std::printf("[AntiSpam] ws2_32.dll not loaded\n"); return 1; }
 
-         MH_Initialize();
-         MH_CreateHook(recv_addr, HookedRecv, (void**)&OriginalRecv);
-         MH_EnableHook(recv_addr);
+     FARPROC recvAddr = GetProcAddress(ws2, "recv");
+     if (!recvAddr) { std::printf("[AntiSpam] recv not found\n"); return 1; }
 
-    }
+     if (MH_Initialize() != MH_OK) {
+          std::printf("[AntiSpam] MH_Initialize failed\n"); return 1;
+     }
+     if (MH_CreateHook(reinterpret_cast<LPVOID>(recvAddr), &HookedRecv,
+          reinterpret_cast<void**>(&g_originalRecv)) != MH_OK) {
+          std::printf("[AntiSpam] MH_CreateHook failed\n"); return 1;
+     }
+     if (MH_EnableHook(reinterpret_cast<LPVOID>(recvAddr)) != MH_OK) {
+          std::printf("[AntiSpam] MH_EnableHook failed\n"); return 1;
+     }
+     std::printf("[AntiSpam] recv hooked OK\n");
+     return 0;
+}
 
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
-    }
-    return TRUE;
+static void Shutdown() {
+     MH_DisableHook(MH_ALL_HOOKS);
+     MH_Uninitialize();
 }
 
 
-//  By XorLaz(小懒仔)  QQ 2499464524
 
- // 2025 .11.30
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved) {
+     switch (reason) {
+     case DLL_PROCESS_ATTACH:
+          DisableThreadLibraryCalls(hModule);
+          CreateThread(nullptr, 0, InitThread, nullptr, 0, nullptr);
+          break;
+     case DLL_PROCESS_DETACH:
+          if (lpReserved == nullptr) Shutdown();
+          break;
+     }
+     return TRUE;
+}
